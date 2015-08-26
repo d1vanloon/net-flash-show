@@ -38,6 +38,7 @@ namespace FlashSlideshow
             axShockwaveFlash.Movie = filenames[currentFile];
             axShockwaveFlash.Loop = false;
             axShockwaveFlash.Play();
+            Activate();
         }
 
         private void monitorMovieStatus()
