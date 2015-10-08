@@ -22,16 +22,5 @@ namespace FlashSlideshow.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection Slides {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Slides"]));
-            }
-            set {
-                this["Slides"] = value;
-            }
-        }
     }
 }

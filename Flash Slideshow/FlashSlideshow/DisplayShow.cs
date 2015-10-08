@@ -36,7 +36,10 @@ namespace FlashSlideshow
         }
 
         /// <summary>
-        /// Aquire the file names to display.
+        /// Aquire the file names to display. This is either
+        /// by prompting the user with a file selection dialog
+        /// or by scanning the folder specified by the command
+        /// line argument.
         /// </summary>
         /// <returns>An array of file names corresponding 
         /// to .swf files to display.</returns>
@@ -156,7 +159,7 @@ namespace FlashSlideshow
         private void DisplayShow_Shown(object sender, EventArgs e)
         {
             filenames = GetFileNames();
-
+            
             StartShow();
         }
     }
