@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DisplayShow));
             this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
             ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).BeginInit();
             this.SuspendLayout();
@@ -39,7 +38,6 @@
             this.axShockwaveFlash.Enabled = true;
             this.axShockwaveFlash.Location = new System.Drawing.Point(0, 0);
             this.axShockwaveFlash.Name = "axShockwaveFlash";
-            this.axShockwaveFlash.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axShockwaveFlash.OcxState")));
             this.axShockwaveFlash.Size = new System.Drawing.Size(512, 400);
             this.axShockwaveFlash.TabIndex = 0;
             // 
@@ -52,6 +50,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "DisplayShow";
             this.Text = "Flash Slideshow";
+            this.TopMost = true;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Shown += new System.EventHandler(this.DisplayShow_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).EndInit();

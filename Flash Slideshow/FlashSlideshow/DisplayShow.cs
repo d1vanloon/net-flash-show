@@ -1,8 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace FlashSlideshow
 {
+    /// <summary>
+    /// Displays a series of .swf files full-screen 
+    /// looped in sequence.
+    /// </summary>
     public partial class DisplayShow : Form
     {
         /// <summary>
@@ -38,12 +43,43 @@ namespace FlashSlideshow
         /// <seealso cref="filenames"/>
         private string[] GetFileNames()
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Multiselect = true;
-            dialog.Filter = "Shockwave Flash | *.swf";
-            dialog.ShowDialog(this);
+            string commandLineDirectory = GetFolderCommandLineArgument();
 
-            return dialog.FileNames;
+            if (commandLineDirectory == null)
+            {
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.Multiselect = true;
+                dialog.Filter = "Shockwave Flash | *.swf";
+                dialog.ShowDialog(this);
+
+                return dialog.FileNames;
+            }
+            else
+            {
+                return Directory.GetFiles(
+                    Path.GetFullPath(commandLineDirectory), 
+                    "*.swf", SearchOption.TopDirectoryOnly);
+            }
+        }
+
+        /// <summary>
+        /// Returns the command line argument describing the folder
+        /// containing file names to display, if it exists.
+        /// </summary>
+        /// <returns>A string describing the folder containing the 
+        /// file names to display, or null if the argument was not
+        /// provided.</returns>
+        private string GetFolderCommandLineArgument()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                return args[1];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -68,6 +104,7 @@ namespace FlashSlideshow
             axShockwaveFlash.Movie = filenames[currentFile];
             axShockwaveFlash.Loop = false;
             axShockwaveFlash.Play();
+            BringToFront();
             Activate();
         }
 
