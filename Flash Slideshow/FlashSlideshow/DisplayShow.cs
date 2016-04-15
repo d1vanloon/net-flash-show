@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
 namespace FlashSlideshow
 {
     /// <summary>
-    /// Displays a series of .swf files full-screen 
+    /// Displays a series of .swf or .mp4 files full-screen 
     /// looped in sequence.
     /// </summary>
     public partial class DisplayShow : Form
@@ -33,6 +34,13 @@ namespace FlashSlideshow
         public DisplayShow()
         {
             InitializeComponent();
+
+            // Don't require the window to be always-on-top if
+            // debugging is enabled.
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                this.TopMost = false;
+            }
         }
 
         /// <summary>
@@ -42,7 +50,7 @@ namespace FlashSlideshow
         /// line argument.
         /// </summary>
         /// <returns>An array of file names corresponding 
-        /// to .swf files to display.</returns>
+        /// to .swf or .mp4 files to display.</returns>
         /// <seealso cref="filenames"/>
         private string[] GetFileNames()
         {
@@ -52,16 +60,29 @@ namespace FlashSlideshow
             {
                 OpenFileDialog dialog = new OpenFileDialog();
                 dialog.Multiselect = true;
-                dialog.Filter = "Shockwave Flash | *.swf";
+                dialog.Filter = "Media |*.swf;*.mp4";
                 dialog.ShowDialog(this);
 
                 return dialog.FileNames;
             }
             else
             {
-                return Directory.GetFiles(
+                // Retrieve a list of swf files in the given directory
+                string[] flashFiles = Directory.GetFiles(
                     Path.GetFullPath(commandLineDirectory), 
                     "*.swf", SearchOption.TopDirectoryOnly);
+                // Retrieve a list of mp4 files in the given directory
+                string[] videoFiles = Directory.GetFiles(
+                    Path.GetFullPath(commandLineDirectory),
+                    "*.mp4", SearchOption.TopDirectoryOnly);
+
+                // Create a new List to merge the two arrays
+                var list = new List<string>();
+                // Add both arrays to the list
+                list.AddRange(flashFiles);
+                list.AddRange(videoFiles);
+                // Return the array representation of the list
+                return list.ToArray();
             }
         }
 
@@ -96,7 +117,7 @@ namespace FlashSlideshow
         }
 
         /// <summary>
-        /// Sets the currently displayed .swf file to be
+        /// Sets the currently displayed file to be
         /// the file in the filenames array indicated by
         /// the currentFile index.
         /// </summary>
@@ -104,9 +125,21 @@ namespace FlashSlideshow
         /// <seealso cref="currentFile"/>
         private void ShowCurrentMovie()
         {
-            axShockwaveFlash.Movie = filenames[currentFile];
-            axShockwaveFlash.Loop = false;
-            axShockwaveFlash.Play();
+            if (filenames[currentFile].EndsWith(".mp4"))
+            {
+                axWindowsMediaPlayer.Visible = true;
+                axShockwaveFlash.Visible = false;
+                axWindowsMediaPlayer.URL = filenames[currentFile];
+                axWindowsMediaPlayer.Ctlcontrols.play();
+            }
+            else
+            {
+                axWindowsMediaPlayer.Visible = false;
+                axShockwaveFlash.Visible = true;
+                axShockwaveFlash.Movie = filenames[currentFile];
+                axShockwaveFlash.Loop = false;
+                axShockwaveFlash.Play();
+            }
             BringToFront();
             Activate();
         }
@@ -119,7 +152,13 @@ namespace FlashSlideshow
         /// <seealso cref="ShowCurrentMovie"/>
         private void MonitorMovieStatus()
         {
-            if (axShockwaveFlash.IsPlaying() == false || axShockwaveFlash.Movie == null)
+            if (axWindowsMediaPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying)
+            {
+                axWindowsMediaPlayer.fullScreen = true;
+            }
+
+            if ((axShockwaveFlash.Visible == true && (axShockwaveFlash.IsPlaying() == false || axShockwaveFlash.Movie == null)) || 
+                (axWindowsMediaPlayer.Visible == true && axWindowsMediaPlayer.playState == WMPLib.WMPPlayState.wmppsStopped))
             {
                 ShowCurrentMovie();
                 currentFile = (currentFile + 1) % filenames.Length;
